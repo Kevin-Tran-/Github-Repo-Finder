@@ -10,11 +10,12 @@ import UIKit
 import MBProgressHUD
 
 // Main ViewController
-class RepoResultsViewController: UIViewController {
+class RepoResultsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate{
 
     var searchBar: UISearchBar!
     var searchSettings = GithubRepoSearchSettings()
 
+    @IBOutlet weak var tableView: UITableView!
     var repos: [GithubRepo]!
 
     override func viewDidLoad() {
@@ -23,6 +24,11 @@ class RepoResultsViewController: UIViewController {
         // Initialize the UISearchBar
         searchBar = UISearchBar()
         searchBar.delegate = self
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 120
 
         // Add SearchBar to the NavigationBar
         searchBar.sizeToFit()
@@ -42,15 +48,41 @@ class RepoResultsViewController: UIViewController {
 
             // Print the returned repositories to the output window
             for repo in newRepos {
+                self.repos = newRepos
                 print(repo)
-            }   
+            }
+            self.tableView.reloadData()
 
             MBProgressHUD.hideHUDForView(self.view, animated: true)
             }, error: { (error) -> Void in
                 print(error)
         })
     }
+    
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if repos != nil {
+            return repos!.count
+        } else {
+            return 0
+        }
+    }
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("GitHubCell", forIndexPath:  indexPath) as! GitHubCell
+        cell.repos = repos[indexPath.row]
+        print(indexPath.row)
+        
+        return cell
+    }
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
 }
+
+
+
+
 
 // SearchBar methods
 extension RepoResultsViewController: UISearchBarDelegate {
