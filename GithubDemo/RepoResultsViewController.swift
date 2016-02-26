@@ -9,6 +9,11 @@
 import UIKit
 import MBProgressHUD
 
+protocol SettingsPresentingViewControllerDelegate: class {
+    func didSaveSettings(settings: GithubRepoSearchSettings)
+    func didCancelSettings()
+}
+
 // Main ViewController
 class RepoResultsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate{
 
@@ -37,6 +42,10 @@ class RepoResultsViewController: UIViewController, UITableViewDataSource, UITabl
         // Perform the first search when the view controller first loads
         doSearch()
     }
+    
+    override func viewDidAppear(animated: Bool) {
+        print(searchSettings.minStars)
+    }
 
     // Perform the search.
     private func doSearch() {
@@ -47,10 +56,11 @@ class RepoResultsViewController: UIViewController, UITableViewDataSource, UITabl
         GithubRepo.fetchRepos(searchSettings, successCallback: { (newRepos) -> Void in
 
             // Print the returned repositories to the output window
-            for repo in newRepos {
-                self.repos = newRepos
-                print(repo)
-            }
+//            for repo in newRepos {
+////                self.repos = newRepos
+//                //print(repo)
+//            }
+            self.repos = newRepos
             self.tableView.reloadData()
 
             MBProgressHUD.hideHUDForView(self.view, animated: true)
@@ -70,7 +80,7 @@ class RepoResultsViewController: UIViewController, UITableViewDataSource, UITabl
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("GitHubCell", forIndexPath:  indexPath) as! GitHubCell
         cell.repos = repos[indexPath.row]
-        print(indexPath.row)
+        //print(indexPath.row)
         
         return cell
     }
@@ -78,11 +88,16 @@ class RepoResultsViewController: UIViewController, UITableViewDataSource, UITabl
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        let navController = segue.destinationViewController as! UINavigationController
+        let vc = navController.topViewController as! SearchSettingsViewController
+        vc.settings = searchSettings// ... Search Settings ...
+        vc.delegate = self
+    }
+    
+    
 }
-
-
-
-
 
 // SearchBar methods
 extension RepoResultsViewController: UISearchBarDelegate {

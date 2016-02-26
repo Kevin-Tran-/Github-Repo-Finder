@@ -94,7 +94,7 @@ class GithubRepo: CustomStringConvertible {
         params["sort"] = "stars";
         params["order"] = "desc";
         
-        print(params)
+        //print(params)
         
         return params;
     }

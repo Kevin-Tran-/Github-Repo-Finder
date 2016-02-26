@@ -20,7 +20,7 @@ class GitHubCell: UITableViewCell {
     var repos: GithubRepo! {
         didSet {
             nameLabel.text = repos.name
-            userLabel.text = repos.ownerHandle
+            userLabel.text = "\(repos.ownerHandle!)"
             if let ownerURL = repos.ownerAvatarURL {
                 userImage.setImageWithURL(NSURL(string: ownerURL)!)
             }
